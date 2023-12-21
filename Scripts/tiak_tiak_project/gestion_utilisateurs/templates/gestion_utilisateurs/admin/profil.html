@@ -1,0 +1,26 @@
+
+{% extends "gestion_utilisateurs/admin/dashboard.html" %}
+{% load static %}
+
+{% block headbloc %}
+
+<link rel="stylesheet" href="">
+{% endblock %}
+
+{% block title %} Profile
+{% endblock %}
+
+{% block content %}
+
+{% include "gestion_utilisateurs/base_profil/profil_base.html" %}
+
+<script>
+
+        var element = document.getElementById("settings");
+        if (element.classList) { 
+            element.classList.add("active");
+        } else {
+            element.className += ' ' + "active";
+        }
+</script>
+{% endblock %}

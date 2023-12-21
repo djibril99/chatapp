@@ -1,0 +1,158 @@
+{% extends 'gestion_utilisateurs/client/base_client.html' %}
+{% load static %}
+
+
+{% block title %} Mes services
+{% endblock %}
+
+        
+
+{% block content %}
+        je suis dans la page mes services
+        <!-- ajouter un div qui prend la hauteur de l ecran -->
+        <div class="min-vh-100">
+                <div class="container">
+
+                        <!--s il n y a pas de livraison  -->
+                        {% if not liste_livraison_en_cours and not liste_livraison_terminees and not liste_livraison_en_attente%}
+
+                        <div class="row">
+                                <div class="col-12">
+                                        <h2 class="text-center text-danger">Vous n'avez pas de livraison en cours</h2>
+                                </div>
+                        </div>
+                        {% endif %}
+
+
+
+                        <!--livraison en attente-->
+                        
+
+                        
+                        {%if liste_livraison_en_attente%}
+                        <div class="row">
+                                <div class="col-12">
+                                        <h2 class="text-center text-warning">Mes Livraisons en attentes</h2>
+                                </div>
+                        </div>
+                        <div class="row">
+                        {% for notification , adresse_depart ,adresse_arrivee in liste_livraison_en_attente %}
+                        <div class="col mb-5">
+                        <div class="card" style="width: 27rem;">
+                                <img class="card-img-top" src="{{ notification.livraison.marchandise.photo.url }}" alt="Card image cap">
+                                <div class="card-body">
+                                  <h5 class="card-title text-warning">Livraisons en attentes</h5>
+                                  <hr>
+                                        Depart : <a href=''>{{adresse_depart}} </a>
+                                  <hr>
+                                        Arrivé : <a href=''>{{adresse_arrivee}} </a>
+                                <hr>
+                                <form action="{% url 'gestion_notifications:choisir_livreur' notification.id %}" method="post">
+                                        {% csrf_token %}
+                                       
+                                        <select name="livreur_id" id="livreur" class="form-control" required placeholder="choisir un livreur">
+                                                {% for postulation in notification.postulation.all %}
+                                                    {% if not postulation.livreur.on_mission %}
+                                                        <option value="{{ postulation.livreur.id }}">
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                <div class="d-flex align-items-center">
+                                                                    <img src="{{ postulation.livreur.user.photo_identite.url }}" alt="" style="width: 45px; height: 45px" class="rounded-circle" />
+                                                                    <div class="ms-3">
+                                                                        <p class="fw-bold mb-1">{{ postulation.livreur.user.prenom }} {{ postulation.livreur.user.nom }}</p>
+                                                                        <p class="text-muted mb-0">{{ postulation.livreur.user.telephone }}</p>
+                                                                        <p class="text-muted mb-0">{{ postulation.livraison.marchandise.description }}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                            
+                                        <input type="submit" value="choisir" class="btn btn-primary">
+                                </form>
+                                {% for postulation in notification.postulation.all %}
+                                                    {% if not postulation.livreur.on_mission %}
+                                                    <a class="dropdown-item" href="#">
+                                                        {{ postulation.livreur.user.prenom }} {{ postulation.livreur.user.nom }}
+                                                    </a>
+                                                    {% endif %}
+                                        {% endfor %}
+                                        
+
+                                <p class="card-text text-muted">{{notification.postulation.livraison.marchandise.description }}</p>
+                                <a href="{% url 'gestion_commandes:detail_livraison' notification.livraison.id %}" class="btn btn-primary">Detail</a>
+                                          
+                                </div>
+                              </div>
+                        </div>
+                        {% endfor %}
+                        
+                        </div>
+                        {% endif%}
+                        
+                        {%if liste_livraison_en_cours%}
+                        <div class="row">
+                                <div class="col-12">
+                                        <h2 class="text-center text-danger">Mes Livraisons en cours</h2>
+                                </div>
+                        </div>
+                        <div class="row">
+                        {% for livraison , adresse_depart ,adresse_arrivee in liste_livraison_en_cours %}
+                        <div class="col mb-5">
+                        <div class="card" style="width: 27rem;">
+                                <img class="card-img-top" src="{{ livraison.marchandise.photo.url }}" alt="Card image cap">
+                                <div class="card-body">
+                                  <h5 class="card-title text-danger">Livraison en cours</h5>
+                                  <hr>
+                                        Depart : <a href=''>{{adresse_depart}} </a>
+                                  <hr>
+                                        Arrivé : <a href=''>{{adresse_arrivee}} </a>
+                                <hr>
+                                        <p class="card-text">code de validation : <span class="text-primary"> {{ livraison.code_validation}} <span> </p>
+                                  <p class="card-text text-muted">{{livraison.marchandise.description }}</p>
+                                  <a  class="btn btn-primary">info du livreur</a>
+                                  <a href="{% url 'gestion_commandes:detail_livraison' livraison.id %}" class="btn btn-primary">Suivi</a>
+                                </div>
+                              </div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                        {% endif%}
+                        
+                        
+
+                        
+
+                        
+                        {%if liste_livraison_terminee%}
+                        <div class="row">
+                                <div class="col-12">
+                                        <h2 class="text-center text-success">Mes Livraisons Terminées {{liste_livraison_terminee.count}} </h2>
+                                </div>
+                        </div>
+                        <div class="row">
+                        {% for livraison , adresse_depart ,adresse_arrivee in liste_livraison_terminee %}
+                        <div class="col mb-5">
+                                <div class="card" style="width: 27rem;">
+                                        <img class="card-img-top" src="{{ livraison.marchandise.photo.url }}" alt="Card image cap">
+                                        <div class="card-body">
+                                        <h5 class="card-title text-success">Livraison Terminée</h5>
+                                        <hr>
+                                                Depart : <a href=''>{{adresse_depart}} </a>
+                                        <hr>
+                                                Arrivé : <a href=''>{{adresse_arrivee}} </a>
+                                        <hr>
+
+                                        </div>
+                                       
+                                          
+                                </div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                        {% endif%}
+                      
+                </div>
+        </div>
+{% endblock %}

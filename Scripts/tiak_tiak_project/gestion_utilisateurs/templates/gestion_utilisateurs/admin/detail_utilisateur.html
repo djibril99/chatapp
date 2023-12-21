@@ -1,0 +1,297 @@
+{% extends "gestion_utilisateurs/admin/dashboard.html" %}
+{% load static %}
+
+{% block content  %}
+
+
+<main id="main" class="main">
+
+        <div class="pagetitle">
+          <h1>Profile</h1>
+        </div><!-- End Page Title -->
+    
+        <section class="section profile">
+          <div class="row">
+            <div class="col-xl-4" >
+    
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                {% if utilisateur.photo_identite %}
+                <a href="{{ utilisateur.photo_identite.url }}" target="_blank">
+                  <img src="{{ utilisateur.photo_identite.url }}" alt="Profile" class="rounded-circle" width="160" , height="160">
+                </a>
+                {% else %}
+                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="" class="rounded-circle" width="160" , height="160">
+                {% endif %}
+                  <h2>{{ utilisateur.prenom }} {{ utilisateur.nom }}</h2>
+                  <h5 class = "text-muted">{{ utilisateur.type_utilisateur }}</h5>
+                  <div class="social-links mt-2">
+                    <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                  </div>
+                </div>
+              </div>
+              {% if livreur %}
+              <h4 class="m-t-0 header-title mb-4">CNI</h4>
+              <div class="card" style="margin-top: 25px;">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                       {% if livreur.photocopie_cni  %}
+                       <a href="{{ livreur.photocopie_cni.url }}" target="_blank">
+                        <img src="{{ livreur.photocopie_cni.url }}" alt="CNI" style="width: 100%; height: 100%; margin-top: 10px;">
+                          </a>
+                        {% else %}
+                         <p class="text-muted">Pas de CNI</p>
+                       {% endif %}
+                
+                </div>
+              </div>
+                  {% endif %}
+    
+            </div>
+    
+            <div class="col-xl-8">
+    
+                <div class="card">
+                        <div class="card-body pt-3">
+                                <nav>
+                                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>
+                                        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Editer Profile</button>
+                                        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Livraions</button>
+                                        </div>
+                                </nav>
+                                <div class="tab-content" id="nav-tabContent">
+                                        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                                
+                                                <div class="">
+                                                        <div class="card profile-header">
+                                                            <div class="body">
+                                                                <div class="row">
+                                                                    
+                                                                    <div class="col-lg-4 col-md-4 col-12">
+                                                                        <div class="profile-image float-md-right">
+                                                                                {% if utilisateur.photo_identite %}
+                                                                                <a href="{{ utilisateur.photo_identite.url }}" target="_blank">
+                                                                                <img src="{{ utilisateur.photo_identite.url }}" alt="Profile" class="" width="200" , height="200">
+                                                                                </a>
+                                                                                {% else %}
+                                                                                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt=""  width="200" , height="200"> 
+                                                                                {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-8 col-md-8 col-12">
+                                                                        <h4 class="m-t-0 m-b-0"><strong>{{utilisateur.prenom }}</strong> {{utilisateur.nom }}</h4>  
+                                                                        <span class="job_post">{{utilisateur.type_utilisateur }}</span>
+                                                                        <p class="m-t-5">{% if  utilisateur.sexe == "m" %}Masculin{% else %}Féminin{% endif %}</p>
+                                                                        <p class="m-t-5">{{utilisateur.telephone }}</p>
+                                                                        <p  style="font-size: 15px;">{{utilisateur.date_naissance}}</p>
+                                                                        <p class="m-t-5">{{utilisateur.email }}</p>
+                                                                        <p  style="font-size: 15px;">{{utilisateur.adresse}}</p>
+                                                                        {% if  utilisateur.type_utilisateur == "livreur" %}
+                                                                        {% endif %}
+                                                                        <div>
+                                                                            <a class="btn btn-primary btn-round btn-simple" href="{% url 'gestion_messages:message' utilisateur.id %}">Message</a>
+                                                                            <a class="btn btn-primary btn-round" href="{% url 'gestion_notifications:liste_notifications' utilisateur.id %}">Livraisons</a>
+                                                                           
+
+                                                                        </div>
+                                                                        <p class="social-icon m-t-5 m-b-0">
+                                                                            <a title="Twitter" href="javascript:void(0);"><i class="fa fa-twitter"></i></a>
+                                                                            <a title="Facebook" href="javascript:void(0);"><i class="fa fa-facebook"></i></a>
+                                                                            <a title="Google-plus" href="javascript:void(0);"><i class="fa fa-twitter"></i></a>
+                                                                            <a title="Behance" href="javascript:void(0);"><i class="fa fa-behance"></i></a>
+                                                                            <a title="Instagram" href="javascript:void(0);"><i class="fa fa-instagram "></i></a>
+                                                                        </p>
+                                                                    </div>                
+                                                                </div>
+                                                               
+                                                            </div>                    
+                                                        </div>
+                                                    </div>
+
+
+                                        </div>
+                                        <!--222222222-->
+                                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+
+                                                <form method="POST" action="{% url 'gestion_utilisateurs:update_utilisateur' utilisateur.id %}" enctype="multipart/form-data">
+                                                        {% csrf_token %}
+                                                        <div class="row mb-3">
+                                                                <label for="prenom" class="col-md-4 col-lg-3 col-form-label">Prenom</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <input name="prenom" type="text" class="form-control" id="prenom" value="{{ utilisateur.prenom }}">
+                                                                </div>
+                                                        </div>
+                                                        <div class="row mb-3">
+                                                                <label for="nom" class="col-md-4 col-lg-3 col-form-label">Nom</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <input name="nom" type="text" class="form-control" id="nom" value="{{ utilisateur.nom }}">
+                                                                </div>
+                                                        </div>
+                                                        <div class="row mb-3">
+                                                                <label for="type_utilisateur" class="col-md-4 col-lg-3 col-form-label">Sexe</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <div class="btn-group">
+                                                                                <input type="radio" class="btn-check" name="sexe" id="option1" autocomplete="off" {% if utilisateur.sexe == "m" %}checked {% endif %} value="m"/>
+                                                                                <label class="btn btn-secondary" for="option1">Masculin</label>
+
+                                                                                <input type="radio" class="btn-check bg-red" name="sexe" id="option2" autocomplete="off" {% if utilisateur.sexe == "f" %}checked {% endif %} value="f"/>
+                                                                                <label class="btn btn-secondary" for="option2">Féminin</label>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+
+                                                        <div class="row mb-3">
+                                                                <label for="email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <input name="email" type="email" class="form-control" id="email" value="{{ utilisateur.email }}">
+                                                                </div>
+                                                        </div>
+                                                        <div class="row mb-3">
+                                                                <label for="date_naissance" class="col-md-4 col-lg-3 col-form-label">Date de naissance</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                  <input type="date" class="form-control" id="date_naissance" name="date_naissance" value="{{ utilisateur.date_naissance }}">
+                                                                </div>
+                                                        </div>
+
+                                                        <div class="row mb-3">
+                                                                <label for="adresse" class="col-md-4 col-lg-3 col-form-label">Adresse</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <input name="adresse" type="text" class="form-control" id="adresse" value="{{ utilisateur.adresse }}">
+                                                                </div>
+                                                        </div>
+                                                        
+                                                        <div class="row mb-3">
+                                                                <label for="telephone" class="col-md-4 col-lg-3 col-form-label">Telephone</label>
+                                                                <div class="col-md-8 col-lg-9">
+                                                                        <input name="telephone" type="text" class="form-control" id="telephone" value="{{ utilisateur.telephone }}">
+                                                                </div>  
+                                                        </div>
+                                                        
+                                    
+                                                        <div class="text-center">
+                                                          <button type="submit" class="btn btn-success">Save Changes</button>
+                                                        </div>
+                                                      </form>
+
+                                        </div>
+                                        <!--333333333333333333333-->
+                                        <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+
+                                          <ul class="list-group list-group-light">
+
+                                            {% for notification in  liste_Notifications  %}
+                                          
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                              <div class="d-flex align-items-center">
+                                                <img src="{{ notification.postulation.livraison.marchandise.client.user.photo_identite.url }}" alt="" style="width: 45px; height: 45px"
+                                                  class="rounded-circle" />
+                                                <div class="ms-3">
+                                                  <p class="fw-bold mb-1">{{ notification.postulation.livraison.marchandise.client.user.prenom }} {{ notification.postulation.livraison.marchandise.client.user.nom }}</p>
+                                                  <p class="text-muted mb-0">{{notification.postulation.livraison.marchandise.client.user.telephone }}</p>
+                                                  <p class="text-muted mb-0">{{notification.postulation.livraison.marchandise.description }}</p>
+                                                </div>
+                                              </div>
+                                              <a class="btn btn-link btn-rounded btn-sm" href="{% url 'gestion_notifications:detail' notification.id utilisateur.id%}"
+                                               role="button">Detail</a>
+                                            </li>
+                                            <br>
+                                            {% endfor %}
+                                            
+                                          </ul>
+
+                                        </div>
+                                </div>
+                        </div>
+    
+                </div>
+                <!--ajouter la liste des ses livraisons -->
+
+
+
+
+              </div>
+    
+            </div>
+          </div>
+        </section>
+    
+      </main><!-- End #main -->
+
+      
+<style>
+        body{
+            margin-top:20px;
+            background:#eee;    
+        }
+        a {
+            color: #f96332;
+        }
+        .m-t-5{
+            margin-top: 5px;   
+        }
+        .card {
+            background: #fff;
+            margin-bottom: 30px;
+            transition: .5s;
+            border: 0;
+            border-radius: .1875rem;
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            box-shadow: none;
+        }
+        .card .body {
+            font-size: 14px;
+            color: #424242;
+            padding: 20px;
+            font-weight: 400;
+        }
+        .profile-page .profile-header {
+            position: relative
+        }
+        
+        .profile-page .profile-header .profile-image img {
+            border-radius: 50%;
+            width: 140px;
+            border: 3px solid #fff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)
+        }
+        
+        .profile-page .profile-header .social-icon a {
+            margin: 0 5px
+        }
+        
+        .profile-page .profile-sub-header {
+            min-height: 60px;
+            width: 100%
+        }
+        
+        .profile-page .profile-sub-header ul.box-list {
+            display: inline-table;
+            table-layout: fixed;
+            width: 100%;
+            background: #eee
+        }
+        
+        .profile-page .profile-sub-header ul.box-list li {
+            border-right: 1px solid #e0e0e0;
+            display: table-cell;
+            list-style: none
+        }
+        
+        .profile-page .profile-sub-header ul.box-list li:last-child {
+            border-right: none
+        }
+        
+        .profile-page .profile-sub-header ul.box-list li a {
+            display: block;
+            padding: 15px 0;
+            color: #424242
+        }
+    </style>
+    
+
+{% endblock  %}

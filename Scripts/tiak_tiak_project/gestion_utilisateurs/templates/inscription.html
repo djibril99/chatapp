@@ -1,0 +1,139 @@
+
+
+              <form method="post" action="{% url 'gestion_utilisateurs:register' %}" enctype="multipart/form-data">
+                <!--gerer les erreurs-->
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-4 pb-2">
+
+                      <div class="form-outline">
+                        <input type="text" id="form3Examplev2" class="form-control form-control-lg" name="prenom" />
+                        <label class="form-label" for="form3Examplev2">Prenom</label>
+                      </div>
+
+                    </div>
+                    <div class="col-md-6 mb-4 pb-2">
+
+                      <div class="form-outline">
+                        <input type="text" id="form3Examplev3" class="form-control form-control-lg" name="nom" />
+                        <label class="form-label" for="form3Examplev3">Nom</label>
+                      </div>
+
+                    </div>
+                  </div>
+
+                <div class="form-outline mb-4">
+                  <input type="email" id="form3Example3cg" class="form-control form-control-lg" name="email" />
+                  <label class="form-label" for="form3Example3cg">Email</label>
+                </div>
+                <div class="form-outline mb-3">
+                  <label for="type_utilisateur" class="col-md-4 col-lg-3 col-form-label">Sexe</label>
+                  <div class="col-md-8 col-lg-9">
+                          <div class="btn-group">
+                                  <input type="radio" class="btn-check" name="sexe" id="option1" autocomplete="off" {% if utilisateur.sexe == "m" %}checked {% endif %} value="m"/>
+                                  <label class="btn btn-secondary" for="option1">Masculin</label>
+
+                                  <input type="radio" class="btn-check bg-red" name="sexe" id="option2" autocomplete="off" {% if utilisateur.sexe == "f" %}checked {% endif %} value="f"/>
+                                  <label class="btn btn-secondary" for="option2">Féminin</label>
+                          </div>
+                  </div>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <input type="date" id="date" class="form-control form-control-lg" name="date_naissance" />
+                    <label class="form-label" for="date"  >Date de naissance</label>
+                </div>
+                <div class="form-outline mb-4">
+                    <input type="text" id="adresse" class="form-control form-control-lg" name="adresse" />
+                    <label class="form-label" for="adresse"  >Votre adresse</label>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <input type="text" id="phone" class="form-control form-control-lg" name="telephone" />
+                    <label class="form-label" for="phone">Numero de Telephone</label>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-4 pb-2">
+
+                      <div class="form-outline">
+                        <input type="text" id="form3Examplev2" class="form-control form-control-lg" name="password" />
+                        <label class="form-label" for="form3Examplev2">password</label>
+                      </div>
+
+                    </div>
+                    <div class="col-md-6 mb-4 pb-2">
+
+                      <div class="form-outline">
+                        <input type="text" id="form3Examplev3" class="form-control form-control-lg" name="password_confirm" />
+                        <label class="form-label" for="form3Examplev3">confirm password</label>
+                      </div>
+
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-md-6 mb-4 pb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="clientRadio" name="utilisateur_type" value="client" checked>
+                            <label class="form-check-label" for="clientRadio">Client</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4 pb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="livreurRadio" name="utilisateur_type" value="livreur">
+                            <label class="form-check-label" for="livreurRadio">Livreur</label>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4" id="photocopie_cni_div">
+                      <input type="file" id="photocopie_cni" name="photocopie_cni" />
+                      <label class="form-label" for="photocopie_cni">Copie de votre carte d'identité</label>
+                  </div>
+                </div>
+                <script>
+                                      // Récupérez les éléments radio Client et Livreur
+                    const clientRadio = document.getElementById("clientRadio");
+                    const livreurRadio = document.getElementById("livreurRadio");
+
+                    // Écoutez les changements dans la sélection
+                    clientRadio.addEventListener("change", togglePhotocopieCNI);
+                    livreurRadio.addEventListener("change", togglePhotocopieCNI);
+                    
+              
+                    // Fonction pour activer ou désactiver le champ de photocopie de la carte d'identité
+                    function togglePhotocopieCNI() {
+                        const photocopieCNI = document.getElementById("photocopie_cni_div");
+
+                        // Si Livreur est sélectionné, rendez le champ requis
+                        if (livreurRadio.checked) {
+                            photocopieCNI.querySelector("input").required = true;
+                            photocopieCNI.style.display = "block"; // Pour afficher le champ
+                        } else {
+                            photocopieCNI.querySelector("input").required = false;
+                            photocopieCNI.style.display = "none"; // Pour masquer le champ
+                        }
+                    }
+                    togglePhotocopieCNI();
+                </script>
+                
+
+                <div class="d-flex justify-content-center">
+                    <button type="submit" 
+                      class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Valider</button>
+                  </div>
+
+                <p class="text-center text-muted mt-5 mb-0">Have already an account? <a id="connexionBtn"
+                    class="fw-bold text-body"><u>Login here</u></a></p>
+
+              </form>
+
+
+ 
+  

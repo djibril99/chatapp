@@ -1,0 +1,142 @@
+
+        <div style="min-height:90vh;">
+                detail de la livraison {{notification.postulation.livraison.id}}
+                {% if notification %}
+                <card class="card" style="height:100%;">
+
+                        <!-- Inclure Leaflet JavaScript -->
+                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+                        <!-- Inclure Leaflet JavaScript -->
+                        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+                        <div id="map" style="width: 100%; height: 500px;"></div>
+                        <script>
+                                function parseData(data){
+                                        str_data = ""+data;
+                                        return parseFloat(str_data.replace(",","."));
+                                }
+                                postion = [0,0];
+                                destination = [0,0];
+
+                                //si c est un livreur on affiche sa position et la position darriver
+                                {% if  user.type_utilisateur == "livreur" %}
+                                        
+                                        if(navigator.geolocation) {
+                                                navigator.geolocation.getCurrentPosition(function(position) {
+                                                position = [position.coords.latitude, position.coords.longitude];
+                                                //console.log(latitude, longitude);
+                                                });
+                                        }
+                                        else{
+                                                position = [parseData("{{notification.postulation.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.postulation.livraison.livreur.longitude|floatformat:16}}")];
+                                        }
+
+                                
+                                {% endif %}
+
+                                {% if user.type_utilisateur == "client"  %}
+                                        {% if  notification.postulation.livraison.livreur %}
+                                                position = [parseData("{{notification.postulation.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.postulation.livraison.livreur.longitude|floatformat:16}}")];
+                                        {% else %}
+                                                position = [parseData("{{notification.postulation.livraison.latitude_depart|floatformat:16}}"),parseData("{{notification.postulation.livraison.longitude_depart|floatformat:16}}")];
+                                        
+                                        {% endif %}
+                                {% endif %}
+                                destination = [parseData("{{notification.postulation.livraison.latitude_arrivee|floatformat:16}}"),parseData("{{notification.postulation.livraison.longitude_arrivee|floatformat:16}}")];
+
+
+                                
+                               
+
+                                var map = L.map('map').setView(position, 13);
+
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        attribution: ''
+                                }).addTo(map);
+/*
+                                var marker_position_depart;
+                                var marker_position_arrivee;
+                                marker_position_depart = L.marker(position).addTo(map);
+                                marker_position_arrivee = L.marker(destination).addTo(map);
+*/
+                                // Créez un icône rouge personnalisé
+                                {% if notification.postulation.livraison.livreur.user.photo_identite %}
+                                var urlPosition = '{{notification.postulation.livraison.livreur.user.photo_identite.url}}' ;
+                                {% else %}
+                                var urlPosition = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpFYCzrT8ZAbe_J0mAA1tAVPjm5zA4i7r4jw&usqp=CAU' ;
+                                {% endif %}
+                                var positionIcon = L.icon({
+                                iconUrl: urlPosition, // Chemin relatif à l'icône rouge
+                                iconSize: [25, 41], // Taille de l'icône
+                                iconAnchor: [12, 41], // Point d'ancrage de l'icône
+                                popupAnchor: [1, -34] // Point d'ancrage du popup
+                                });
+                                marker_position_depart = L.marker(position, { icon: positionIcon }).addTo(map);
+
+                                {% if notification.postulation.livraison.marchandise.client.user.photo_identite %}
+                                        var destinationIcon = L.icon({
+                                                iconUrl: '{{notification.postulation.livraison.marchandise.client.user.photo_identite.url}}', // Chemin relatif à l'icône rouge
+                                                iconSize: [25, 41], // Taille de l'icône
+                                                iconAnchor: [12, 41], // Point d'ancrage de l'icône
+                                                popupAnchor: [1, -34] // Point d'ancrage du popup
+                                                });
+                                        marker_position_arrivee = L.marker(destination, { icon: destinationIcon }).addTo(map);
+                                {% else %}
+                                        marker_position_arrivee = L.marker(destination).addTo(map);
+                                {% endif %}
+                                // Utilisez cet icône pour votre marqueur
+                               
+                                
+
+                                                        
+                        </script>
+
+                        <div class="card-body col-md-7 col-lg-9 align-content-center">
+                                {% if notification.postulation.livraison.etat_livraison %}
+                                <h5 class="card-title text-success text-center">Colis Livré</h5>
+                                {% else %}
+                                <h5 class="card-title text-danger text-center">Colis Non Livré</h5>
+                                {% endif %}
+                          <table>
+                                <tr>
+                                       
+                                <td> De:<i class="fas fa-map-marker-alt"></i></td>
+                                <td>
+                                        <address>
+                                        {{position_depart}}
+                                        </address>
+                                </td>
+                                <td>Vers:<i class="fas fa-map-marker-alt"></i></td>
+                                <td>
+
+                                        <address>
+                                        {{position_arrivee}}
+                                        </address>
+                                </td>
+                                </tr>
+                                {%if notification.postulation.livraison.livreur%}
+                                <tr>
+                                        <td><h5 class="card-title text-success text-center">Information du livreur</h5></td>
+                                </tr>
+                                <tr>
+                                <td><i class="far fa-envelope"></i></td>
+                                <td>{{notification.postulation.livraison.livreur.user.email}}</td>
+                                </tr>
+                                <tr>
+                                <td><i class="fas fa-phone"></i></td>
+                                <td>{{notification.postulation.livraison.livreur.user.telephone}}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                        <td></td>
+                                        <td>  <span class ="text-danger">Pas de livreur affecté</span></td>
+                                </tr>
+                                {% endif %}
+                                
+                          </table>
+                        </div>
+                      </card>
+                      {% endif %}
+
+        </div>
+

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <!-- Google Fonts Pre Connect -->
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <!-- Meta Tags -->
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Fonts Links (Roboto 400, 500 and 700 included) -->
+        <!--inclure bootstrap sur diango-->
+        {% load static %}
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+                integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+                crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+                crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        
+        {% block headbloc %}
+        {% endblock %}
+
+
+        <!-- Title -->
+        <title>
+                {% block title %}
+                {% endblock %}
+        </title>
+</head>
+
+
+<!-- slogan : la rapidité et la sécurité à votre service-->
+
+<body>
+        <!--barre de navigation-->
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" data-bs-theme="dark">
+                <div class="container-fluid">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <style>
+                                .logo {
+                                        font-family: 'Times New Roman', Times, serif;
+                                        font-weight: 600;
+                                        font-size: 1.4rem;
+                                        color: #fff;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.1rem;
+                                        margin-left: 0.5rem;
+                                }
+                        </style>
+
+                        <a class="navbar-brand" href="#">
+                                <span class="logo">Tiak-Tiak</span>
+                        </a>
+                        <div class="collapse navbar-collapse " id="navbarTogglerDemo03">
+                                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                        <li class="nav-item">
+                                                <a class="nav-link active" aria-current="page" href="{% url 'gestion_notifications:index' %}">Accueil <span class="badge rounded-pill bg-success" id="nombre_livraison"></span></a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                                <a class="nav-link" href="{% url 'gestion_commandes:mes_livraisons_livreur' %}">mes Livraisons</a>
+                                        </li>
+                                        <li class="nav-item">
+                                                <a class="nav-link" href="{% url 'gestion_messages:message' %}">Messages <span class="badge rounded-pill bg-success" id="nombre_message">5</span>
+                                                </a>
+                                                <!--ajouter un badge pour le nombre de message non lu-->
+                                                
+                                        </li>
+                                        
+                                        <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" href="#" role="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <!-- un petit photo de profil circulaire depuis l attribut photo_identite de user-->
+                                                        {% if user.photo_identite %}
+                                                                <img src="{{user.photo_identite.url}}" class="rounded-circle" width="30" height="30"  style="object-fit: cover;">
+                                                        {% endif %}
+                                                        <!--prenom et nom de l'utilisateur-->
+                                                        <span class="user-name">{{user.prenom}} {{user.nom}}</span>
+                                                        
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" id=""  href="{% url 'gestion_utilisateurs:my_profil' %}" >Modifier mon profil</a></li>
+                                                        <li>
+                                                                <hr class="dropdown-divider">
+                                                        </li>
+                                                        <li><a class="dropdown-item" href="{% url 'gestion_utilisateurs:logout' %}">Déconnexion</a>
+                                                        </li>
+                                                </ul>
+                                        </li>
+
+                                </ul>
+                                
+                                <!--bloc barre de recherche-->
+                                {% block search %}
+                                {% endblock %}
+                        </div>
+                </div>
+        </nav> 
+        <br>
+
+
+
+        {% block content %}
+
+        <!--contenu de la page pour client-->
+        
+        {% endblock %}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script>
+                var eventsource = new EventSource("{% url 'gestion_notifications:stream_notifications' %}");
+                eventsource.onopen = function (e) {
+                    console.log("Connection opened");
+                }
+                eventsource.onmessage = function (e) {
+                        
+                       
+                        console.log("Message received:", e.data); // Afficher le message reçu dans la console
+                        try {
+                            var eventData = JSON.parse(e.data); // Parsez le message JSON
+                            console.log("Parsed data:", eventData); // Afficher les données parsées
+                            // Vous pouvez maintenant manipuler eventData comme un objet JavaScript
+                            var id_nbre_livraison = document.getElementById("nombre_livraison") ; 
+                            var id_nbre_message = document.getElementById("nombre_message") ;
+                            id_nbre_livraison.innerHTML = eventData.livraion ;
+                            id_nbre_message.innerHTML = eventData.message ;
+                            
+                           
+                        } catch (error) {
+                            console.error("Error parsing data:", error); // En cas d'erreur de parsing JSON
+                        }
+                    }
+                    
+                eventsource.onerror = function (e) {
+                    console.error("Error occurred:", e.data); // Afficher les erreurs dans la console
+                }
+                function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                                var cookies = document.cookie.split(';');
+                                for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                        break;
+                                }
+                                }
+                        }
+                        return cookieValue;
+                }
+
+                function envoyerPositionAuServeur(longitude, latitude) {
+                        // Obtenir le jeton CSRF à partir du cookie
+                        var csrfToken = getCookie('csrftoken');
+                    
+                        // Créer un objet contenant les données de position et le jeton CSRF
+                        var positionData = {
+                            longitude: longitude,
+                            latitude: latitude,
+                            csrfmiddlewaretoken: csrfToken  // Inclure le jeton CSRF
+                        };
+                    
+                        // Effectuer une requête AJAX POST vers le serveur Django
+                        $.ajax({
+                            url: "{% url 'gestion_utilisateurs:update_position' %}",  // Remplacez par l'URL de votre vue Django
+                            method: "POST",
+                            data: JSON.stringify(positionData),
+                            contentType: "application/json",
+                            success: function(response) {
+                                // Gérer la réponse du serveur si nécessaire
+                            },
+                            error: function(error) {
+                                console.error("Erreur lors de l'envoi de la position au serveur:", error);
+                            }
+                        });
+                    }
+                    
+                setInterval(function() {
+                        if ('geolocation' in navigator) {
+                                // Obtenir la position actuelle
+                                navigator.geolocation.getCurrentPosition(function(position) {
+                                    var longitude = position.coords.longitude;
+                                    var latitude = position.coords.latitude;
+                        
+                                    // Envoyer les données de position au serveur
+                                    envoyerPositionAuServeur(longitude, latitude);
+                                }, function(error) {
+                                    console.error("Erreur de géolocalisation:", error);
+                                });
+                            } else {
+                                console.error("La géolocalisation n'est pas prise en charge par ce navigateur.");
+                            }
+                }, 30000); // Envoi toutes les 2 minute 
+                    
+                
+        </script>
+
+
+        <!-- Footer -->
+        <br>
+        <footer class="text-center text-lg-start bg-dark text-muted text-white" id="endPage">
+                <!-- Section: Social media -->
+                <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom text-white">
+                        <!-- Left -->
+                        <div class="me-5 d-none d-lg-block">
+                                <span class="text-white">Get connected with us on social networks:</span>
+                        </div>
+                        <!-- Left -->
+
+                        <!-- Right -->
+                        <div>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-facebook-f" style="color: #1877F2;"></i>
+                                </a>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-twitter" style="color: #1DA1F2;"></i>
+                                </a>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-google" style="color: #DB4437;"></i>
+                                </a>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-instagram" style="color: #E4405F;"></i>
+                                </a>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-linkedin" style="color: #0077B5;"></i>
+                                </a>
+                                <a href="" class="me-4 link-secondary">
+                                        <i class="fab fa-github" style="color: #ffffff;"></i>
+                                </a>
+                        </div>
+
+                        <!-- Right -->
+                </section>
+                <!-- Section: Social media -->
+
+                <!-- Section: Links  -->
+                <section class="">
+                        <div class="container text-center text-md-start mt-5 text-white">
+                                <!-- Grid row -->
+                                <div class="row mt-3">
+                                        <!-- Grid column -->
+                                        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                                                <!-- Content -->
+                                                <h6 class="text-uppercase fw-bold mb-4">
+                                                        <i class="fas fa-gem me-3 text-secondary"></i> <span
+                                                                class="logo">Tiak-Tiak</span>
+                                                </h6>
+                                                <p>
+                                                        Here you can use rows and columns to organize your footer
+                                                        content. Lorem ipsum
+                                                        dolor sit amet, consectetur adipisicing elit.
+                                                </p>
+                                        </div>
+                                        <!-- Grid column -->
+
+                                        <!-- Grid column -->
+                                        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                                                <!-- Links -->
+                                                <h6 class="text-uppercase fw-bold mb-4">
+                                                        Products
+                                                </h6>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Angular</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">React</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Vue</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Laravel</a>
+                                                </p>
+                                        </div>
+                                        <!-- Grid column -->
+
+                                        <!-- Grid column -->
+                                        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                                                <!-- Links -->
+                                                <h6 class="text-uppercase fw-bold mb-4">
+                                                        Useful links
+                                                </h6>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Pricing</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Settings</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Orders</a>
+                                                </p>
+                                                <p>
+                                                        <a href="#!" class="text-reset">Help</a>
+                                                </p>
+                                        </div>
+                                        <!-- Grid column -->
+
+                                        <!-- Grid column -->
+                                        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                                                <!-- Links -->
+                                                <h6 class="text-uppercase fw-bold mb-4" id="contact">Contact</h6>
+                                                <p><i class="fas fa-home me-3 text-secondary"></i> New York, NY 10012,
+                                                        US</p>
+                                                <p>
+                                                        <i class="fas fa-envelope me-3 text-secondary"></i>
+                                                        info@example.com
+                                                </p>
+                                                <p><i class="fas fa-phone me-3 text-secondary"></i> + 01 234 567 88</p>
+                                                <p><i class="fas fa-print me-3 text-secondary"></i> + 01 234 567 89</p>
+                                        </div>
+                                        <!-- Grid column -->
+                                </div>
+                                <!-- Grid row -->
+                        </div>
+                </section>
+                <!-- Section: Links  -->
+
+                <!-- Copyright -->
+                <div class="text-center p-4 text-white" style="background-color: rgba(1, 1, 1, 0.25);">
+                        © 2021 Copyright:
+                        <a class="text-reset fw-bold" href="#">
+                                <span class="logo">Tiak-Tiak</span>
+                        </a>
+                </div>
+                <!-- Copyright -->
+        </footer>
+        <!-- Footer -->
+</body>
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,134 @@
+
+
+<div style="min-height:90vh;" class="contener">
+        <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+        
+        <div class="container rounded bg-white mt-5 mb-5">
+                <div class="row">
+                    <div class="col-md-3 border-right">
+                        <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                                {% if user.photo_identite %}
+                                <img class="rounded-circle mt-5" width="150px" src="{{user.photo_identite.url}}">
+                                {% else %}
+                                <img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                                {% endif %}
+                                <span class="text-black-50">{{user.email}}</span>
+                                <center>
+                                <div class="row mt-2">
+                                        <div class="col-md-6"><label class="labels">changer de profil</label><input type="file" class="form-control" name="photo_identite"> </div>
+                                </div>
+                                </center>
+
+                        </div>
+                        <!--section pour afficher les messages -->
+                        
+                         {% if errors %}
+                         <div class="alert alert-danger" role="alert">
+                                <ul class="messages">
+                                {% for message in errors %}
+                                        <li class="text-danger">{{ message }}</li>
+                                {% endfor %}
+                                </ul>
+                        </div>
+                        {% endif %}
+                       
+
+                        
+                        {% if success %}
+                        <div class="alert alert-success" role="alert">
+                                <ul class="messages">
+                                {% for message in success %}
+                                        <li class="text-success">{{ message }}</li>
+                                {% endfor %}
+                                </ul>
+                        </div>
+                        {% endif %}
+                        
+                    
+                </div>
+                    <div class="col-md-5 border-right">
+                        <div class="p-3 py-5">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="text-right">Parametre du Compte {{user.type_utilisateur}}</h4>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6"><label class="labels">Prenom</label><input type="text" class="form-control" placeholder="prenom" value="{{user.prenom}}" name="prenom"> </div>
+                                <div class="col-md-6"><label class="labels">nom</label><input type="text" class="form-control" value="{{user.nom}}" placeholder="nom" name="nom"></div>
+                            </div>
+                            <br>
+                            <div "row mt-2">
+                                <div class="col-md-12"><label class="labels">Sexe</label>
+                                <div class="btn-group p-1">
+                                    <input type="radio" class="btn-check" name="sexe" id="option1" autocomplete="off" {% if user.sexe == "m" %}checked {% endif %}/>
+                                    <label class="btn btn-secondary" for="option1">Masculin</label>
+
+                                    <input type="radio" class="btn-check bg-red" name="sexe" id="option2" autocomplete="off" {% if user.sexe == "f" %}checked {% endif %} />
+                                    <label class="btn btn-secondary" for="option2">Féminin</label>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12"><label class="labels">Email</label><input type="text" class="form-control" placeholder="email" value="{{user.email}}" name="email"></div>
+                                <div class="col-md-12"><label class="labels">Date de naissance</label><input type="date" class="form-control"  value="{{user.date_naissance}}" name="date_naissance"></div>
+                                <div class="col-md-12"><label class="labels">Adresse</label><input type="text" class="form-control" placeholder="adresse" value="{{user.adresse}} " name="adresse"></div>
+                                <div class="col-md-12"><label class="labels">Numero de Telephone</label><input type="number" class="form-control" placeholder="telephone" value="{{user.telephone}}" name="telephone"></div>
+                                <div class="col-md-12"><label class="labels">Nouveau Mot de Passe</label><input type="password" class="form-control" placeholder="Nouveau mot de passe" value="" name="new_password"></div>
+                                <div class="col-md-12"><label class="labels">Confirme Mot de Passe</label><input type="password" class="form-control" placeholder="corfirmation du mot de passe" value="" name="confirm_password"></div>
+                                <div class="col-md-12"><label class="labels">Actuel Mot de Passe</label><input type="text" class="form-control" placeholder="actuelle mot de passe"  value="" required name="password"></div>
+                                
+                            </div>
+                            
+                            <div class="mt-5 text-center"><input class="btn btn-success " type="submit" value="Enregistrer"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            </div>
+            </div>
+        </form>
+</div>
+<style>
+        .contener {
+                background:#eee;    
+            }
+            
+            .form-control:focus {
+                box-shadow: none;
+                border-color: #BA68C8
+            }
+            
+            
+            
+            .profile-button:hover {
+                background: #682773
+            }
+            
+            .profile-button:focus {
+                background: #682773;
+                box-shadow: none
+            }
+            
+            .profile-button:active {
+                background: #682773;
+                box-shadow: none
+            }
+            
+            .back:hover {
+                color: #682773;
+                cursor: pointer
+            }
+            
+            .labels {
+                font-size: 11px
+            }
+            
+            .add-experience:hover {
+                background: #BA68C8;
+                color: #fff;
+                cursor: pointer;
+                border: solid 1px #BA68C8
+            }
+</style>
+

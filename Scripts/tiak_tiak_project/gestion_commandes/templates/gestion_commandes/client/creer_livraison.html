@@ -1,0 +1,236 @@
+
+{% extends "gestion_utilisateurs/client/base_client.html" %}
+{% load static %}
+
+{% block title %} Mes services
+{% endblock %}
+
+        
+
+{% block content %}
+<br style = "margin-top : 60px;">
+
+<!--ajouter une carte maps pour choisir les coordonnées de départ et d'arrivée-->
+<!-- Inclure Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+<!-- Inclure Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<div id="map" style="width: 100%; height: 500px;"></div>
+
+
+
+<script>
+
+
+//recuperer la position de l'utilisateur
+var latitude = 0;
+var longitude = 0;
+if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+        //console.log(latitude, longitude);
+        });
+}
+else {
+        alert("Votre navigateur ne prend pas en compte la géolocalisation HTML5");
+}
+
+if (latitude == 0 && longitude == 0){
+        latitude =14,793306108921762;
+        longitude = -17,344665527343754;
+}
+
+var map = L.map('map').setView([latitude, longitude], 7);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: ''
+}).addTo(map);
+
+var marker;
+var marker_position_depart;
+var marker_position_arrivee;
+
+map.on('click', function(e) {
+        if (marker) {
+        map.removeLayer(marker); // Supprimer le marqueur précédent
+        }
+
+        marker = L.marker(e.latlng).addTo(map);
+
+        // Récupérer les coordonnées
+        latitude = e.latlng.lat;
+        longitude = e.latlng.lng;
+
+        // Utilisez ces coordonnées comme vous le souhaitez
+        console.log('Latitude : ' + latitude + ', Longitude : ' + longitude);
+});
+function get_postion(longitude, latitude ){
+        const data = {
+                latitude: latitude,
+                longitude: longitude
+            };
+        
+            // Configuration de la requête POST
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            };
+        
+            // Envoi de la requête au serveur
+            fetch('{% url "gestion_commandes:get_position_exacte" %}', requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    // Traitement de la réponse du serveur
+                    console.log(data); // Faire quelque chose avec la position renvoyée par le serveur
+                    //element.value = data;
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la requête:', error);
+                });
+}
+function get_start_livraison_locatation(){
+        if (marker_position_depart) {
+                map.removeLayer(marker_position_depart); // Supprimer le marqueur précédent
+        }
+
+        marker_position_depart = L.marker([latitude, longitude]).addTo(map);
+        document.getElementById("id_longitude_depart").value = longitude;
+        document.getElementById("id_latitude_depart").value = latitude;
+}
+function get_end_livraison_locatation(){
+       
+        if (marker_position_arrivee) {
+                map.removeLayer(marker_position_arrivee); // Supprimer le marqueur précédent
+        }
+
+        marker_position_arrivee = L.marker([latitude, longitude]).addTo(map);
+
+        get_postion(longitude, latitude);
+
+        document.getElementById("id_longitude_arrivee").value = longitude;
+        document.getElementById("id_latitude_arrivee").value = latitude;
+}
+
+</script>
+        <div class="" style = "margin-top : 2%;">
+                <center>
+
+                <h1>Créer une livraison</h1>
+                <!--verifier qui la livraission est affecter a un livreur-->
+                {% if livreur %}
+                        <h5>affectation de la livraison au livreur {{livreur.user.prenom}} {{livreur.user.nom}}</h5>
+                <form method="post"  enctype="multipart/form-data" action="{% url 'gestion_commandes:affecter_livraison' livreur.id %}">
+                {% else %}
+                
+
+                <form method="post"  enctype="multipart/form-data" action="{% url 'gestion_commandes:creer_livraison' %}">
+                {% endif %}
+                        {% csrf_token %}
+                        <!--grstion des erreurs-->
+                        {% if form.errors %}
+                                <div class="alert alert-danger">
+                                <strong>Erreurs:</strong>
+                                <ul>
+                                        {% for field, error_list in form.errors.items %}
+                                        {% for error in error_list %}
+                                                <li style="color: red;">{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                        {% endfor %}
+                                </ul>
+                                </div>
+                        {% endif %}
+                        <!-- position de depart -->
+                        <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_longitude_depart">Longitude</label>
+                                            <input type="number" class="form-control" id="id_longitude_depart" placeholder="Longitude" name="longitude_depart" readonly required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_latitude_depart">Latitude</label>
+                                            <input type="number" class="form-control" id="id_latitude_depart" placeholder="Latitude" name="latitude_depart" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <br>
+                        <button type="button" onclick="get_start_livraison_locatation()" class="btn btn-primary">Position marchandise</button>
+                       
+
+                        <!-- position d'arrivée -->
+                        <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_longitude_arrivee">Longitude</label>
+                                            <input type="number" class="form-control" id="id_longitude_arrivee" placeholder="Longitude" name="longitude_arrivee" readonly required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_latitude_arrivee">Latitude</label>
+                                            <input type="number" class="form-control" id="id_latitude_arrivee" placeholder="Latitude" name="latitude_arrivee" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <br>
+                        <button type="button" onclick="get_end_livraison_locatation()" class="btn btn-primary">Destination Marchandise</button>
+                        <br><br>
+
+                        <!-- Champs pour ajouter poids et mode de livraison -->
+                        <div class="container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="poi">Poids du colis (en kg)</label>
+                                            <input type="number" class="form-control" id="poi" name="poids" value="0">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="mode_livraison">Mode de livraison</label>
+                                            <select class="form-control" id="mode_livraison" name="mode_livraison" required>
+                                                <option value="terrestre">Terrestre</option>
+                                                {% if not livreur %}
+                                                    <option value="aerienne">Aérienne</option>
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <br>
+                        <!-- Champs pour ajouter une photo du colis -->
+                        <div class="form-row col-5 col-md-6 col-lg-3">
+                                <label for="colis">Photo du coli</label>
+                                <input type="file" class="form-control-file" id="colis"  name="photo_marchandise" required>
+                        </div>
+                        <br>
+                        <!-- Champs pour ajouter une description du colis -->
+                        <div class="form-row  col-md-8 col-lg-8">
+                                <br>
+                                <label for="id_description">Ajouter une petite description</label>
+                                <textarea class="form-control" id="id_description" rows="3"  name="description" rows="4" cols="50"></textarea>
+                        </div>
+                        
+                        <!-- bouton de validation du formulaire centré-->
+                        
+                        <input type="submit" class="btn btn-primary" value="Valider">
+                    </form>
+                </center>
+                
+        </div>
+        
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "gestion_utilisateurs/admin/dashboard.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<!--bootstrap css-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+crossorigin="anonymous">
+
+
+
+
+<div class="container vh-60">
+    
+        {% if notification %}
+                <h2 class="text-center"> Mode {{ notification.livraison.mode_livraison }}</h2>
+    
+        <div class="card mb-3">
+                <!-- En-tête avec la photo de profil, le nom et le prénom -->
+            <div class="card-header bg-light">
+                <div class="row">
+                    <div class="col-2 col-md-2 col-lg-1">
+                        {% if notification.livraison.marchandise.client.user.photo_identite %}
+                            <img src="{{notification.livraison.marchandise.client.user.photo_identite.url}}"  class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                        {% else %}
+                            <img src="https://i.imgur.com/8RKXAIV.jpg" alt="user" class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <h5 class="card-title">{{ notification.livraison.marchandise.client.user.prenom }} {{ notification.livraison.marchandise.client.user.nom }}</h5>
+                        <p class="card-text">{{ notification.livraison.marchandise.client.user.telephone }}</p>
+                    </div>
+                </div>
+            </div>
+    
+            <!--image de la carte-
+    
+    
+            <img src="https://mdbcdn.b-cdn.net/img/new/slides/041.webp" class="card-img-top" alt="Wild Landscape"/>
+            -ajouter une carte maps-->
+             <!-- Ajouter la carte maps -->
+             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+             <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+             <div id="map{{ notification.id }}" style="width: 100%; height: 500px;"></div>
+             <script>
+                var postition_depart=[parseData('{{ notification.livraison.latitude_depart }}'),parseData('{{ notification.livraison.longitude_depart }}')];
+                var postition_arrivee=[parseData('{{ notification.livraison.latitude_arrivee }}'),parseData('{{ notification.livraison.longitude_arrivee }}')];
+            
+                var map{{ notification.id }} = L.map('map{{ notification.id }}').setView(postition_depart, 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: ''}).addTo(map{{ notification.id }});
+            
+                var marker_depart = L.marker(postition_depart).addTo(map{{ notification.id }});
+                var marker_arrivee = L.marker(postition_arrivee).addTo(map{{ notification.id }});
+             </script>
+    
+    
+    
+            <div class="card-body">
+                
+    
+                <div class="card mb-3" style="">
+                    <div class="row g-0">
+                            
+                        {% if notification.livraison.marchandise.photo %}
+                    <div class="col-md-4">
+                        <!--image verticale a gauche-->
+                        <a href="{{notification.livraison.marchandise.photo.url}}" target="_blank">
+                            <img src="{{notification.livraison.marchandise.photo.url}}"
+                            class="img-fluid rounded-start"
+                            />
+                    </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-8">
+                            <div class="card-body little-profile text-center">
+                                
+                                <p class="card-text"><span style="font-weight: bold;">Description: </span>{{ notification.livraison.marchandise.description }}</p>
+                                
+                                {% if livreur in notification.livreurs_postule.all %}
+                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-danger btn-md btn-rounded" data-abc="true">Annuler</a>
+                            {% else %}
+                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">Postuler</a>
+                            {% endif %}
+                                    <a href="{% url 'gestion_notifications:supprimer' id_notification=notification.id id_utilisateur=notification.livraison.marchandise.client.user.id %} " class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">supprimer</a>
+                                <br>
+                                
+                                <div class="row text-center m-t-20">
+                                    <div class="col-lg-4 col-md-4 m-t-20">
+                                        <h3 class="m-b-0 font-light"> </h3><small>Choisir un Livreur</small>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 m-t-20">
+                                        <h3 class="m-b-0 font-light">{{distance|floatformat:2}} Km</h3><small>Distance</small>
+                                    </div>
+    
+                                    <div class="col-lg-4 col-md-4 m-t-20">
+                                        <h3 class="m-b-0 font-light"></h3>
+                                        <small>
+                                            {% if notification.livraison.livreur  %}
+                                                {% if notification.livraison.livreur.user.photo_identite %}
+                                                    <img src="{{notification.livraison.livreur.user.photo_identite.url}}"  class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                                                {% endif %}
+                                                {{ notification.livraison.livreur.user.prenom }} {{ notification.livraison.livreur.user.nom }}
+                                            
+                                            {% else %}
+                                                <span class="badge badge-danger">Aucun livreur</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                    </div>
+                    </div>
+            </div>
+    
+    
+            </div>
+          </div>
+    
+    
+        
+                       
+                    
+        
+        {% else %}
+    
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <p>Desolé , aucune livraison n'est disponible pour le moment</p>
+                    </div>
+                </div>
+            </div>
+    
+        {% endif %}
+    </div>
+
+
+
+
+{% endblock %}
+
+
+

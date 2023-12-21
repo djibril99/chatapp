@@ -1,0 +1,15 @@
+{% extends 'gestion_utilisateurs/client/base_client.html' %}
+{% load static %}
+
+{% block headbloc %}
+
+<link rel="stylesheet" href="{% static 'css/message.css' %}">
+{% endblock %}
+
+{% block title %} Messagerie {% endblock %}
+
+{% block content %}
+
+{% include "gestion_messages/message_base/message.html" %}
+
+{% endblock %}

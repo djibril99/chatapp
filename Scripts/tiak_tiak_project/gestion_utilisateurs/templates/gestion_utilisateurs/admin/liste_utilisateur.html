@@ -1,0 +1,98 @@
+{% extends "gestion_utilisateurs/admin/dashboard.html" %}
+{% load static %}
+
+
+
+<script>
+  let page = "{{ page }}"; // Assurez-vous que page est une chaîne de caractères valide
+  console.log(typeof(page));
+  console.log("page");
+</script>
+
+{% block content %}
+    <table class="table align-middle mb-0 bg-white">
+        <thead class="bg-light">
+                <!--ajouter une barre de recherche-->
+                
+                <center>
+                  <form action="{% url 'gestion_utilisateurs:recherche_utilisateur' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-6 ">
+                        <div class="input-group mb-3">
+                          <input type="text" class="form-control" placeholder="Rechercher"  name="recherche">
+                          <input class="btn btn-outline-secondary" type="submit" id="button-addon2" value="Rechercher">
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </center>
+                
+          <tr>
+            <th>Prenom Nom</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date De Naissance</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for utilisateur in listes_utilisateurs %}
+          {% if utilisateur.user.type_utilisateur == "livreur" %}
+               
+                {% if  utilisateur.actif %}
+                  <tr class="table-success">
+                {% else %}
+                  <tr class="table-danger">
+                {% endif %}
+          {% else %}
+            <tr>
+          {% endif %}
+         
+            <td>
+              <div class="d-flex align-items-center">
+                {% if utilisateur.user.photo_identite %}
+                <img
+                    src="{{utilisateur.user.photo_identite.url}}"
+                    class="rounded-circle"
+                    alt=""
+                    style="width: 45px; height: 45px"
+                    />
+                {% endif %}
+                <div class="ms-3">
+                  <p class="fw-bold mb-1">{{utilisateur.user.prenom}} {{utilisateur.user.nom}}</p>
+                  <p class="text-muted mb-0">{{utilisateur.user.telephone}}</p>
+                </div>
+              </div>
+            </td>
+            <td>
+              <p class="fw-normal mb-1"> {{utilisateur.user.type_utilisateur}}</p>
+            </td>
+            <td>
+              {% if utilisateur.user.type_utilisateur == "livreur" %}
+                        {% if  utilisateur.actif %}
+                        <p class="fw-normal mb-1">  <a href="{% url 'gestion_utilisateurs:changer_etat_livreur' utilisateur.id %}" class="badge badge-danger rounded-pill d-inline" >Desactiver</a> </p>
+                        <p class="fw-normal mb-2 text-success"> compte activé</p>
+                        {% else %}
+                        <p class="fw-normal mb-1">  <a href="{% url 'gestion_utilisateurs:changer_etat_livreur' utilisateur.id %}" class="badge badge-success rounded-pill d-inline" >Activer</a> </p>
+                        <p class="fw-normal mb-2 text-danger"> compte désactivé</p>
+                        {% endif %} 
+              
+                {% else %}
+                  <span class="text-success">Active</span>
+                {% endif %}
+            </td>
+            <td>{{utilisateur.user.date_naissance}}</td>
+            <td>
+             <a href="{% url 'gestion_utilisateurs:detail_utilisateur' utilisateur.user.id %}" class="btn btn-primary">Detail</a>
+            </td>
+          </tr>
+          {% endfor %}
+
+
+        </tbody>
+      </table>
+
+
+
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends "gestion_utilisateurs/livreur/base_livreur.html" %}
+{% load static %}
+
+<!--bootstrap css-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+crossorigin="anonymous">
+
+
+{% block content %}
+<br><br>
+<script>
+    function parseData(data){
+        str_data = ""+data;
+        return parseFloat(str_data.replace(",","."));
+}
+</script>
+
+<div class="container vh-60">
+    {% if notifications %}
+
+    {% for distance , notification in notifications %}
+
+    <div class="card mb-3">
+            <!-- En-tête avec la photo de profil, le nom et le prénom -->
+        <div class="card-header bg-light">
+            <div class="row">
+                <div class="col-2 col-md-2 col-lg-1">
+                    {% if notification.livraison.marchandise.client.user.photo_identite %}
+                        <a href="{{notification.livraison.marchandise.client.user.photo_identite.url}}" target="_blank">
+                             <img src="{{notification.livraison.marchandise.client.user.photo_identite.url}}"  class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                        </a>
+                    {% else %}
+                        <img src="https://i.imgur.com/8RKXAIV.jpg" alt="user" class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <h5 class="card-title">{{ notification.livraison.marchandise.client.user.prenom }} {{ notification.livraison.marchandise.client.user.nom }}</h5>
+                    <p class="card-text">{{ notification.livraison.marchandise.client.user.telephone }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!--image de la carte-
+
+
+        <img src="https://mdbcdn.b-cdn.net/img/new/slides/041.webp" class="card-img-top" alt="Wild Landscape"/>
+        -ajouter une carte maps-->
+         <!-- Ajouter la carte maps -->
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+ <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+ <div id="map{{ notification.id }}" style="width: 100%; height: 500px;"></div>
+ <script>
+    var postition_depart=[parseData('{{ notification.livraison.latitude_depart }}'),parseData('{{ notification.livraison.longitude_depart }}')];
+    var postition_arrivee=[parseData('{{ notification.livraison.latitude_arrivee }}'),parseData('{{ notification.livraison.longitude_arrivee }}')];
+
+    var map{{ notification.id }} = L.map('map{{ notification.id }}').setView(postition_depart, 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: ''}).addTo(map{{ notification.id }});
+
+    var marker_depart = L.marker(postition_depart).addTo(map{{ notification.id }});
+    var marker_arrivee = L.marker(postition_arrivee).addTo(map{{ notification.id }});
+ </script>
+
+
+
+        <div class="card-body">
+            
+
+            <div class="card mb-3" style="">
+                <div class="row g-0">
+                    {% if notification.livraison.marchandise.photo %}
+                <div class="col-md-4">
+                    <!--image verticale a gauche-->
+                    <a href="{{notification.livraison.marchandise.photo.url}}" target="_blank">
+                    <img
+                    src="{{notification.livraison.marchandise.photo.url}}"
+                    alt="Trendy Pants and Shoes"
+                    class="img-fluid rounded-start"
+                    />
+                    </a>
+                </div>
+                {% endif %}
+                <div class="col-md-8">
+                        <div class="card-body little-profile text-center">
+                            
+                            <p class="card-text"><span style="font-weight: bold;">Description: </span>{{ notification.livraison.marchandise.description }}</p>
+                            
+                            {% if livreur in notification.livreurs_postule.all %}
+                            <a href="{% url 'gestion_notifications:annuler' notification.id %}" class="m-t-10 waves-effect waves-dark btn btn-danger btn-md btn-rounded" data-abc="true">Annuler</a>
+                        {% else %}
+                        
+                        <form action="{% url 'gestion_notifications:postuler' notification.id %}" method="POST" class="form-inline">
+                            {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                      <label for="staticprix2" class="">Prix à Proposer : </label>
+                                      <input type="number"  class="form-control" id="staticprix2" value="0" name ="prix" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success mb-2">Postuler</button>
+                        </form>
+<!--
+                            <a href="{% url 'gestion_notifications:postuler' notification.id %}" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">Postuler</a>
+-->
+                            {% endif %}
+                            <br>
+                            
+                            <div class="row text-center m-t-20">
+                                <div class="col-lg-4 col-md-4 m-t-20">
+                                    <h3 class="m-b-0 font-light">{{ notification.livreurs_postule.count }} </h3><small>livreur(s) Postulé(s)</small>
+                                </div>
+                                <div class="col-lg-4 col-md-4 m-t-20">
+                                    <h3 class="m-b-0 font-light">{{distance|floatformat:2}} Km</h3><small>Distance</small>
+                                </div>
+                                <div class="col-lg-4 col-md-4 m-t-20">
+                                    {% if livreur in notification.livreurs_postule.all %}
+                                        {% for postulation in  notification.postulation.all%}
+                                            {% if  postulation.livreur == livreur %}
+                                            <h3 class="m-b-0 font-light">
+                                                <span class = "text-success">  {{ postulation.prixPropose }} Fcfa </span>
+                                            </h3><small>Prix proposé</small>
+                                                
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <h3 class="m-b-0 font-light">
+                                            <span class = "text-alerte">  50 Fcfa </span>
+                                        </h3><small>Prix par défaut</small>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                
+                </div>
+                </div>
+        </div>
+
+
+        </div>
+      </div>
+
+
+      
+
+
+    {% endfor %}
+    
+                   
+                
+    
+    {% else %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <p>Desolé , aucune livraison n'est disponible pour le moment</p>
+                </div>
+            </div>
+        </div>
+
+
+    {% endif %}
+</div>
+{% endblock %}
+
+<style>
+    .content{
+        background:#eee;    
+    }
+  
+    
+    .padding {
+        padding: 3rem !important;
+    }
+    
+    .card-img-top{
+        height:300px;
+    }
+    
+    .card-no-border .card {
+        border-color: #d7dfe3;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        -webkit-box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.05)
+    }
+    
+    .card-body {
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: 1.25rem
+    }
+    
+    .pro-img {
+        margin-top: -80px;
+        margin-bottom: 20px
+    }
+    
+    .little-profile .pro-img img {
+        width: 128px;
+        height: 128px;
+        -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 100%
+    }
+    
+    html body .m-b-0 {
+        margin-bottom: 0px
+    }
+    
+    h3 {
+        line-height: 30px;
+        font-size: 21px
+    }
+    
+    .btn-rounded.btn-md {
+        padding: 12px 35px;
+        font-size: 16px
+    }
+    
+    html body .m-t-10 {
+        margin-top: 10px
+    }
+    
+    .btn-primary,
+    .btn-primary.disabled {
+        background: #7460ee;
+        border: 1px solid #7460ee;
+        -webkit-box-shadow: 0 2px 2px 0 rgba(116, 96, 238, 0.14), 0 3px 1px -2px rgba(116, 96, 238, 0.2), 0 1px 5px 0 rgba(116, 96, 238, 0.12);
+        box-shadow: 0 2px 2px 0 rgba(116, 96, 238, 0.14), 0 3px 1px -2px rgba(116, 96, 238, 0.2), 0 1px 5px 0 rgba(116, 96, 238, 0.12);
+        -webkit-transition: 0.2s ease-in;
+        -o-transition: 0.2s ease-in;
+        transition: 0.2s ease-in
+    }
+    
+    .btn-rounded {
+        border-radius: 60px;
+        padding: 7px 18px
+    }
+    
+    .m-t-20 {
+        margin-top: 20px
+    }
+    
+    .text-center {
+        text-align: center !important
+    }
+    
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #455a64;
+        font-family: "Poppins", sans-serif;
+        font-weight: 400
+    }
+    
+    p {
+        margin-top: 0;
+        margin-bottom: 1rem
+    }
+    .container{
+        background: #eee
+    }
+</style>
