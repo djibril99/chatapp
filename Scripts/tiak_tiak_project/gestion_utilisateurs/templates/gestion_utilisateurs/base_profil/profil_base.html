@@ -58,15 +58,17 @@
                             </div>
                             <br>
                             <div "row mt-2">
-                                <div class="col-md-12"><label class="labels">Sexe</label>
-                                <div class="btn-group p-1">
-                                    <input type="radio" class="btn-check" name="sexe" id="option1" autocomplete="off" {% if user.sexe == "m" %}checked {% endif %}/>
-                                    <label class="btn btn-secondary" for="option1">Masculin</label>
+                                <div class="col-md-12">
+                                    <label class="labels">Sexe</label>
+                                    <div class="btn-group p-1">
+                                        <input type="radio" class="btn-check" name="sexe" id="option1" {% if user.sexe == "m" %}checked{% endif %} value="m"/>
+                                        <label class="btn btn-secondary" for="option1">Masculin</label>
 
-                                    <input type="radio" class="btn-check bg-red" name="sexe" id="option2" autocomplete="off" {% if user.sexe == "f" %}checked {% endif %} />
-                                    <label class="btn btn-secondary" for="option2">Féminin</label>
+                                        <input type="radio" class="btn-check bg-red" name="sexe" id="option2" {% if user.sexe == "f" %}checked{% endif %} value="f"/>
+                                        <label class="btn btn-secondary" for="option2">Féminin</label>
+                                    </div>
                                 </div>
-                                </div>
+
                             </div>
                             <div class="row mt-3">
                                 <div class="col-md-12"><label class="labels">Email</label><input type="text" class="form-control" placeholder="email" value="{{user.email}}" name="email"></div>

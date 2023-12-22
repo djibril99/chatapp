@@ -42,7 +42,7 @@ def livraison_user_connecte(request):
                 if user.type_utilisateur == 'client':
                         client = Client.objects.get(user=user)
                         """mode postulation"""
-                        liste_livraison_en_attente = [(notification , obtenir_adresse(latitude=notification.livraison.latitude_depart, longitude=notification.livraison.longitude_depart) ,obtenir_adresse(latitude=notification.livraison.latitude_arrivee, longitude=notification.livraison.longitude_arrivee) ) for notification in Notification.objects.filter(livraison__marchandise__client=client)]
+                        liste_livraison_en_attente = [(notification , obtenir_adresse(latitude=notification.livraison.latitude_depart, longitude=notification.livraison.longitude_depart) ,obtenir_adresse(latitude=notification.livraison.latitude_arrivee, longitude=notification.livraison.longitude_arrivee) ) for notification in Notification.objects.filter(livraison__marchandise__client=client , livraison__livreur=None)]
                         liste_livraison_en_cours = [(livraison , obtenir_adresse(latitude=livraison.latitude_depart, longitude=livraison.longitude_depart) ,obtenir_adresse(latitude=livraison.latitude_arrivee, longitude=livraison.longitude_arrivee) ) for livraison in Livraison.objects.filter(marchandise__client=client, etat_livraison=False).exclude(livreur=None)]
                         liste_livraison_terminee = [(livraison , obtenir_adresse(latitude=livraison.latitude_depart, longitude=livraison.longitude_depart) ,obtenir_adresse(latitude=livraison.latitude_arrivee, longitude=livraison.longitude_arrivee) ) for livraison in Livraison.objects.filter(marchandise__client=client, etat_livraison=True)]
                         
@@ -154,6 +154,18 @@ def validation_livraison(request , id_livraison):
                                 messages.error(request, "Code de validation incorrect")
                                 
         return redirect('gestion_commandes:mes_livraisons_livreur')
+#supprimer une livraison
+def supprimer_livraison(request, id_livraison):
+
+        livraison = Livraison.objects.get(id=id_livraison)
+       
+        notification = Notification.objects.get(livraison=livraison)
+        for postulation in notification.postulation.all():
+                postulation.delete()
+        livraison.delete()
+        notification.delete()
+        return redirect('gestion_commandes:mes_livraisons')
+                
 #""""""""
 #administrateur afficher les livraisons par drone
 def livraison_par_drone(request):
@@ -167,9 +179,10 @@ def livraison_par_drone(request):
                 livraisons_en_attente = livraisons_aeriennes.filter(etat_livraison=False, livreur=None)
                 livraisons_en_cours = livraisons_aeriennes.filter(etat_livraison=False).exclude(livreur=None)
                 livraisons_terminees = livraisons_aeriennes.filter(etat_livraison=True)
+                toutes_livraisons = list(livraisons_en_attente) + list(livraisons_en_cours) + list(livraisons_terminees)
                 context = {  }
                 if len(livraisons_en_attente) > 0:
-                        context['livraisons_en_attente'] = livraisons_en_attente #+ livraisons_en_cours + livraisons_terminees
+                        context['livraisons_en_attente'] = toutes_livraisons
                
                         
                 return render(request, 'gestion_commandes/admin/liste_livraison_drone.html', context)

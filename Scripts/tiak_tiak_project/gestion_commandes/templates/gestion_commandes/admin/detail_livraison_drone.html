@@ -9,9 +9,6 @@
 integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
 crossorigin="anonymous">
 
-
-
-
 <div class="container vh-60">
     
         {% if notification %}
@@ -43,16 +40,16 @@ crossorigin="anonymous">
              <!-- Ajouter la carte maps -->
              <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
              <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-             <div id="map{{ notification.id }}" style="width: 100%; height: 500px;"></div>
+             <div id="map{{notification.id}}" style="width: 100%; height: 500px;"></div>
              <script>
                 var postition_depart=[parseData('{{ notification.livraison.latitude_depart }}'),parseData('{{ notification.livraison.longitude_depart }}')];
                 var postition_arrivee=[parseData('{{ notification.livraison.latitude_arrivee }}'),parseData('{{ notification.livraison.longitude_arrivee }}')];
             
-                var map{{ notification.id }} = L.map('map{{ notification.id }}').setView(postition_depart, 7);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: ''}).addTo(map{{ notification.id }});
+                var vari{{ notification.id }} = L.map('map{{ notification.id }}').setView(postition_depart, 7);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: ''}).addTo(vari{{ notification.id }});
             
-                var marker_depart = L.marker(postition_depart).addTo(map{{ notification.id }});
-                var marker_arrivee = L.marker(postition_arrivee).addTo(map{{ notification.id }});
+                var marker_depart = L.marker(postition_depart).addTo(vari{{ notification.id }});
+                var marker_arrivee = L.marker(postition_arrivee).addTo(vari{{ notification.id }});
              </script>
     
     
@@ -78,17 +75,30 @@ crossorigin="anonymous">
                                 
                                 <p class="card-text"><span style="font-weight: bold;">Description: </span>{{ notification.livraison.marchandise.description }}</p>
                                 
-                                {% if livreur in notification.livreurs_postule.all %}
-                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-danger btn-md btn-rounded" data-abc="true">Annuler</a>
+                                {% if notification.livraison.livreur%}
+                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-danger btn-md btn-rounded" data-abc="true">Valider</a>
                             {% else %}
-                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">Postuler</a>
+                                <a href="" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">choisir un livreur</a>
                             {% endif %}
-                                    <a href="{% url 'gestion_notifications:supprimer' id_notification=notification.id id_utilisateur=notification.livraison.marchandise.client.user.id %} " class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded" data-abc="true">supprimer</a>
+
+                                    <a href="{% url 'gestion_notifications:supprimer' id_notification=notification.id id_utilisateur=notification.livraison.marchandise.client.user.id %} " class="m-t-10 waves-effect waves-dark btn btn-danger btn-md btn-rounded" data-abc="true">supprimer</a>
                                 <br>
                                 
                                 <div class="row text-center m-t-20">
                                     <div class="col-lg-4 col-md-4 m-t-20">
-                                        <h3 class="m-b-0 font-light"> </h3><small>Choisir un Livreur</small>
+                                        <h3 class="m-b-0 font-light">
+                                            {% if notification.livraison.livreur  %}
+                                                <span class="badge badge-success"> 
+                                                {% if notification.livraison.livreur.user.photo_identite %}
+                                                    <a target="_blank" href="{{notification.livraison.livreur.user.photo_identite.url}}">
+                                                    <img src="{{notification.livraison.livreur.user.photo_identite.url}}"  class="rounded-circle" style="max-width: 50px; max-height: 50px;">
+                                                    </a>
+                                                {% endif %}
+                                                {{ notification.livraison.livreur.user.prenom }} {{ notification.livraison.livreur.user.nom }}</span>
+                                            {% else %}
+                                                <span class="badge badge-danger">Aucun livreur</span>
+                                            {% endif %}    
+                                        </h3><small>Livreur affecté</small>
                                     </div>
                                     <div class="col-lg-4 col-md-4 m-t-20">
                                         <h3 class="m-b-0 font-light">{{distance|floatformat:2}} Km</h3><small>Distance</small>

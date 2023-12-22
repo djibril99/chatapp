@@ -56,7 +56,9 @@
                                                         <option value="{{ postulation.livreur.id }}">
                                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                                 <div class="d-flex align-items-center">
+                                                                 {% if postulation.livreur.user.photo_identite %}
                                                                     <img src="{{ postulation.livreur.user.photo_identite.url }}" alt="" style="width: 45px; height: 45px" class="rounded-circle" />
+                                                                {% endif %}
                                                                     <div class="ms-3">
                                                                         <p class="fw-bold mb-1">{{ postulation.livreur.user.prenom }} {{ postulation.livreur.user.nom }}</p>
                                                                         <p class="text-muted mb-0">{{ postulation.livreur.user.telephone }}</p>
@@ -80,9 +82,10 @@
                                         {% endfor %}
                                         
 
-                                <p class="card-text text-muted">{{notification.postulation.livraison.marchandise.description }}</p>
+                                <p class="card-text text-muted">{{notification.livraison.marchandise.description }}</p>
                                 <a href="{% url 'gestion_commandes:detail_livraison' notification.livraison.id %}" class="btn btn-primary">Detail</a>
-                                          
+                                
+                                 <a href="{% url 'gestion_commandes:supprimer_livraison' notification.livraison.id %}" class="btn btn-danger">Supprimer</a> 
                                 </div>
                               </div>
                         </div>

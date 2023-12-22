@@ -158,8 +158,8 @@ def accepter_postule(request , notification_id):
                 livreur.on_mission = True
                 livreur.save()
                 #valider la postulation
-                notification.postulation.livraison.livreur = livreur
-                notification.postulation.livraison.save()
+                notification.livraison.livreur = livreur
+                notification.livraison.save()
                 notification.save()
         return redirect('gestion_commandes:mes_livraisons')
 
@@ -168,13 +168,13 @@ def liste_notification_admin(request,id_utilisateur):
         utilisateur = Utilisateur.objects.get(id=id_utilisateur)
         if utilisateur.type_utilisateur == 'livreur':
                 livreur = Livreur.objects.get(user=utilisateur)
-                notifications = Notification.objects.filter(Q(postulation__livraison__livreur = livreur) | Q(postulation__livreurs_postule=livreur))
+                notifications = Notification.objects.filter(Q(livraison__livreur = livreur) | Q(livreurs_postule=livreur))
         elif utilisateur.type_utilisateur == 'client':
                 client = Client.objects.get(user=utilisateur)
-                notifications = Notification.objects.filter(postulation__livraison__marchandise__client=client)
+                notifications = Notification.objects.filter(livraison__marchandise__client=client)
         liste_notifications = []
         for notification in notifications :
-                livraison = notification.postulation.livraison
+                livraison = notification.livraison
                 if livraison :
                         distance = calculer_distance(livraison.longitude_depart , livraison.latitude_depart , livraison.longitude_arrivee , livraison.latitude_arrivee)
                         data = (distance , notification)

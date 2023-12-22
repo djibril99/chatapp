@@ -110,10 +110,12 @@ def my_profil(request):
 
     if request.method == 'POST':
         form = UpdateProfil(request.POST, request.FILES, instance=utilisateur)
+        print(request.POST)
         if form.is_valid():
             form.save(user=utilisateur)  # Vous n'avez pas besoin de passer 'user=utilisateur' car le formulaire utilise déjà l'instance
             success.append('Modification réussie.')
         else:
+            print('errors : ', form.errors)
             errors.extend(form.errors)
 
     context = {
@@ -252,15 +254,15 @@ def detail_utilisateur(request, id):
         if utilisateur.type_utilisateur == 'livreur':
                 livreur = Livreur.objects.get(user=utilisateur)
                 livraisons_postuler = Notification.objects.filter(livreurs_postule= livreur)
-                livraisons_effectuer = Notification.objects.filter(postulation__livraison__livreur=livreur)
+                livraisons_effectuer = Notification.objects.filter(livraison__livreur=livreur)
                 liste_Notifications = list(livraisons_postuler) + list(livraisons_effectuer)
         #liste des livraisons poster par le client
         if utilisateur.type_utilisateur == 'client':
                 client = Client.objects.get(user=utilisateur)
-                livraisons_poster = Notification.objects.filter(postulation__livraison__marchandise__client=client)
+                livraisons_poster = Notification.objects.filter(livraison__marchandise__client=client)
                 liste_Notifications = list(livraisons_poster)
                 
-        print(len(liste_Notifications))
+        print('liste_Notifications : ', liste_Notifications)
         context = {
                 'utilisateur': utilisateur,
                 'liste_Notifications': liste_Notifications,

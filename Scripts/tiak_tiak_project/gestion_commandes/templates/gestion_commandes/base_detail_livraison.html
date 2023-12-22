@@ -1,6 +1,6 @@
 
         <div style="min-height:90vh;">
-                detail de la livraison {{notification.postulation.livraison.id}}
+                Detail de la livraison {{notification.livraison.id}}
                 {% if notification %}
                 <card class="card" style="height:100%;">
 
@@ -28,21 +28,21 @@
                                                 });
                                         }
                                         else{
-                                                position = [parseData("{{notification.postulation.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.postulation.livraison.livreur.longitude|floatformat:16}}")];
+                                                position = [parseData("{{notification.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.livraison.livreur.longitude|floatformat:16}}")];
                                         }
 
                                 
                                 {% endif %}
 
                                 {% if user.type_utilisateur == "client"  %}
-                                        {% if  notification.postulation.livraison.livreur %}
-                                                position = [parseData("{{notification.postulation.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.postulation.livraison.livreur.longitude|floatformat:16}}")];
+                                        {% if  notification.livraison.livreur %}
+                                                position = [parseData("{{notification.livraison.livreur.latitude|floatformat:16}}"),parseData("{{notification.livraison.livreur.longitude|floatformat:16}}")];
                                         {% else %}
-                                                position = [parseData("{{notification.postulation.livraison.latitude_depart|floatformat:16}}"),parseData("{{notification.postulation.livraison.longitude_depart|floatformat:16}}")];
+                                                position = [parseData("{{notification.livraison.latitude_depart|floatformat:16}}"),parseData("{{notification.livraison.longitude_depart|floatformat:16}}")];
                                         
                                         {% endif %}
                                 {% endif %}
-                                destination = [parseData("{{notification.postulation.livraison.latitude_arrivee|floatformat:16}}"),parseData("{{notification.postulation.livraison.longitude_arrivee|floatformat:16}}")];
+                                destination = [parseData("{{notification.livraison.latitude_arrivee|floatformat:16}}"),parseData("{{notification.livraison.longitude_arrivee|floatformat:16}}")];
 
 
                                 
@@ -60,8 +60,8 @@
                                 marker_position_arrivee = L.marker(destination).addTo(map);
 */
                                 // Créez un icône rouge personnalisé
-                                {% if notification.postulation.livraison.livreur.user.photo_identite %}
-                                var urlPosition = '{{notification.postulation.livraison.livreur.user.photo_identite.url}}' ;
+                                {% if notification.livraison.livreur.user.photo_identite %}
+                                var urlPosition = '{{notification.livraison.livreur.user.photo_identite.url}}' ;
                                 {% else %}
                                 var urlPosition = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpFYCzrT8ZAbe_J0mAA1tAVPjm5zA4i7r4jw&usqp=CAU' ;
                                 {% endif %}
@@ -73,9 +73,9 @@
                                 });
                                 marker_position_depart = L.marker(position, { icon: positionIcon }).addTo(map);
 
-                                {% if notification.postulation.livraison.marchandise.client.user.photo_identite %}
+                                {% if notification.livraison.marchandise.client.user.photo_identite %}
                                         var destinationIcon = L.icon({
-                                                iconUrl: '{{notification.postulation.livraison.marchandise.client.user.photo_identite.url}}', // Chemin relatif à l'icône rouge
+                                                iconUrl: '{{notification.livraison.marchandise.client.user.photo_identite.url}}', // Chemin relatif à l'icône rouge
                                                 iconSize: [25, 41], // Taille de l'icône
                                                 iconAnchor: [12, 41], // Point d'ancrage de l'icône
                                                 popupAnchor: [1, -34] // Point d'ancrage du popup
@@ -92,7 +92,7 @@
                         </script>
 
                         <div class="card-body col-md-7 col-lg-9 align-content-center">
-                                {% if notification.postulation.livraison.etat_livraison %}
+                                {% if notification.livraison.etat_livraison %}
                                 <h5 class="card-title text-success text-center">Colis Livré</h5>
                                 {% else %}
                                 <h5 class="card-title text-danger text-center">Colis Non Livré</h5>
@@ -114,17 +114,17 @@
                                         </address>
                                 </td>
                                 </tr>
-                                {%if notification.postulation.livraison.livreur%}
+                                {%if notification.livraison.livreur%}
                                 <tr>
                                         <td><h5 class="card-title text-success text-center">Information du livreur</h5></td>
                                 </tr>
                                 <tr>
                                 <td><i class="far fa-envelope"></i></td>
-                                <td>{{notification.postulation.livraison.livreur.user.email}}</td>
+                                <td>{{notification.livraison.livreur.user.email}}</td>
                                 </tr>
                                 <tr>
                                 <td><i class="fas fa-phone"></i></td>
-                                <td>{{notification.postulation.livraison.livreur.user.telephone}}</td>
+                                <td>{{notification.livraison.livreur.user.telephone}}</td>
                                 </tr>
                                 {% else %}
                                 <tr>
