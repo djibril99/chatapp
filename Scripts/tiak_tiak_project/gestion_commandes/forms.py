@@ -1,5 +1,4 @@
 from django import forms
-from gestion_utilisateurs.models import Livreur, Client, Utilisateur
 from .models import Marchandise, Livraison
 import random
 import string
@@ -15,7 +14,7 @@ class LivraisonMarchandiseForm(forms.ModelForm):
     description = forms.CharField(max_length=500, widget=forms.Textarea)
 
     def clean(self):
-        cleaned_data = super().clean()
+        self.cleaned_data = super().clean()
         # Vous pouvez ajouter des validations personnalisées ici si nécessaire
 
     # GÉNÉRER UN CODE ALÉATOIRE DE 150 CARACTÈRES
