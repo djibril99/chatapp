@@ -10,6 +10,8 @@ class Postulation(models.Model):
     livraison = models.ForeignKey(Livraison, on_delete=models.CASCADE, null=True, blank=True)
     livreur = models.ForeignKey(Livreur, on_delete=models.CASCADE, null=True, blank=True)
     prixPropose = models.FloatField(null=True, blank=True)
+    def __str__(self):
+        return f"{self.id} postulation de {self.livreur} pour {self.livraison.marchandise.client}"
     
     
 class Notification(models.Model):

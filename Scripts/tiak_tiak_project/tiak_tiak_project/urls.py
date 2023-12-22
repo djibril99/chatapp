@@ -36,3 +36,8 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += [path('__debug__/', include(debug_toolbar.urls)),]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "Administration de Tiak Tiak"
+admin.site.site_title = "Tiak Tiak"
+admin.site.index_title = "Bienvenue sur le site de Tiak Tiak"
+

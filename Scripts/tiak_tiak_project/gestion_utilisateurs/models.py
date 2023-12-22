@@ -5,7 +5,11 @@ class Utilisateur(models.Model):
     #attribut de l utilisateur
     nom = models.CharField(null=True,max_length=255)
     prenom = models.CharField(null=True,max_length=255)
-    sexe =  models.CharField(null=True,max_length=1)
+    SEXE_CHOICES = (
+        ('m', 'Masculin'),
+        ('f', 'Feminin')
+    )
+    sexe =  models.CharField(null=True,max_length=1, choices=SEXE_CHOICES)
     
     email = models.EmailField(null=True,max_length=255)
     
@@ -15,7 +19,7 @@ class Utilisateur(models.Model):
     
     photo_identite = models.ImageField(upload_to='photos_identite/', null=True, blank=True)
     
-    login = models.CharField(max_length=255)
+    #login = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     #ajouter le type d utilisateur pour l indentifier lors de la connexion
     ROLE_CHOICES = (
@@ -27,6 +31,13 @@ class Utilisateur(models.Model):
     # Autres champs d'utilisateur
     type_utilisateur = models.CharField(max_length=10, choices=ROLE_CHOICES , default=ROLE_CHOICES[0][0])
     online = models.BooleanField(default=False)
+    def __str__(self):
+        return self.prenom + " " + self.nom + " (" + self.type_utilisateur + ")" 
+    class Meta:
+        verbose_name = "Utilisateur"
+        verbose_name_plural = "Utilisateurs"
+        db_table = 'utilisateur'
+
 
 
 class Client(models.Model):
@@ -34,7 +45,7 @@ class Client(models.Model):
     # Vous pouvez ajouter des attributs spécifiques au client ici si nécessaire
     user = models.OneToOneField(Utilisateur, on_delete=models.CASCADE , default=None )
     def __str__(self):
-        return self.user.prenom 
+        return self.user.__str__()  # Utilisez un attribut approprié pour l'identification du client
 
 class Livreur(models.Model):
     id = models.AutoField(primary_key=True)
@@ -49,11 +60,11 @@ class Livreur(models.Model):
     on_mission = models.BooleanField(default=False)
     # Ajoutez d'autres attributs spécifiques au livreur ici si nécessaire
     def __str__(self):
-        return self.user.prenom  # Utilisez un attribut approprié pour l'identification du livreur
+        return self.user.__str__()  # Utilisez un attribut approprié pour l'identification du livreur
 
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, default=None )
     # Vous pouvez ajouter des attributs spécifiques à l'administrateur ici si nécessaire
     def __str__(self):
-        return self.user.prenom   # Utilisez un attribut approprié pour l'identification de l'administrateur
+        return self.user.__str__()  # Utilisez un attribut approprié pour l'identification de l'administrateur
